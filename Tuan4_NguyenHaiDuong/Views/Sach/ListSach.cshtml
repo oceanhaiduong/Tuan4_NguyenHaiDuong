@@ -1,0 +1,72 @@
+﻿@model IEnumerable<Tuan4_NguyenHaiDuong.Models.Sach>
+@{
+    ViewBag.Title = "ListSach";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .TieuDe {
+        text-align: center;
+        padding: 5px;
+    }
+
+    .nd_TieuDe {
+        text-align: center;
+        padding: 5px;
+    }
+
+    .Table {
+        border: solid;
+    }
+
+    .h2 {
+        color: red;
+        background-color: yellow;
+    }
+
+    .TieuDe:hover {
+        font: bold;
+        background-color: aqua;
+        color: red;
+    }
+
+    .nd_TieuDe:hover {
+        font: bold;
+        background-color: yellowgreen;
+        color: blue;
+    }
+</style>
+<marquee scrolldelay="30">Chào mừng bạn đến với cửa hàng sách!!</marquee>
+<h2>THÔNG TIN SÁCH</h2>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table" border="1px">
+    <tr>
+        <th class="TieuDe"> Mã loại </th>
+        <th class="TieuDe"> Tên sách</th>
+        <th class="TieuDe"> Hình </th>
+        <th class="TieuDe"> Giá bán</th>
+        <th class="TieuDe"> Ngày cập nhật </th>
+        <th class="TieuDe"> Số lượng tồn</th>
+        <th class="TieuDe"> Tùy chọn</th>
+        
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td td class="nd_TieuDe">@Html.DisplayFor(modelItem => item.maloai)</td>
+            <td td class="nd_TieuDe">@Html.DisplayFor(modelItem => item.tensach)</td>
+            <td td class="nd_TieuDe"><img src="@item.hinh" alt="hinh thumbnail" /></td>
+            <td td class="nd_TieuDe">@Html.DisplayFor(modelItem => item.giaban)</td>
+            <td td class="nd_TieuDe">@Html.DisplayFor(modelItem => item.ngaycapnhat)</td>
+            <td td class="nd_TieuDe">@Html.DisplayFor(modelItem => item.soluongton)</td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.masach }) |
+                @Html.ActionLink("Detail", "Detail", new { id = item.masach }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.masach })
+            </td>
+        </tr>
+        }
+</table>
+
+

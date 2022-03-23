@@ -17,6 +17,7 @@ namespace Tuan4_NguyenHaiDuong.Controllers
 
             return View(all_sach);
         }
+        //SADAD
         public ActionResult Detail(int id)
         {
             var D_sach = data.Saches.Where(m => m.masach == id).First(); return View(D_sach);

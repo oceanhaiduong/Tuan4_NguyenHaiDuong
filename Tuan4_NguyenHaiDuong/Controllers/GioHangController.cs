@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Services.Description;
 using Tuan4_NguyenHaiDuong.Models;
 
 namespace Tuan4_NguyenHaiDuong.Controllers
@@ -69,10 +70,16 @@ namespace Tuan4_NguyenHaiDuong.Controllers
         }
         public ActionResult GioHang()
         {
-            List < Giohang > lstGiohang = Laygiohang();
+            List<Giohang > lstGiohang = Laygiohang();
             ViewBag.Tongsoluong = TongSoLuong();
             ViewBag.Tongtien = TongTien();
             ViewBag.Tongsoluongsanpham= TongSoLuongSanPham();
+            ViewBag.Message = Session["Message"];
+            ViewBag.AlertStatus = Session["AlertStatus"];
+            Session.Remove("Message");
+            ViewBag.Message1 = Session["Message1"];
+            Session.Remove("Message1");
+            Session.Remove("AlertStatus");
             return View(lstGiohang);
         }
         public ActionResult GioHangPartial()
@@ -93,15 +100,84 @@ namespace Tuan4_NguyenHaiDuong.Controllers
             }
             return RedirectToAction("GioHang");
         }
+        [HttpGet]
+        public ActionResult DatHang()
+        {
+            if (Session["TaiKhoan"] == null || Session["TaiKhoan"].ToString() == "")
+            {
+                return RedirectToAction("DangNhap", "NguoiDung");
+            }
+            if (Session["Giohang"] == null)
+            {
+                return RedirectToAction("Index", "Sach");
+            }
+            List<Giohang> lstGiohang = Laygiohang();
+            ViewBag.Tongsoluong = TongSoLuong();
+            ViewBag.Tongtien = TongTien();
+            ViewBag.Tongsoluongsanpham = TongSoLuongSanPham();
+            return View(lstGiohang);
+        }
+        [HttpPost]
+        public ActionResult DatHang(FormCollection colection)
+        {
+            DonHang dh = new DonHang();
+            KhachHang kh = (KhachHang)Session["TaiKhoan"];
+            Sach s = new Sach();
+            List<Giohang> gh= Laygiohang();
+            var ngaygiao = String.Format("{0:MM/dd/yyyy}", colection["NgayGiao"]);
+            dh.makh = kh.makh;
+            dh.ngaydat= DateTime.Now;
+            dh.ngaygiao = DateTime.Parse(ngaygiao);
+            if (dh.ngaygiao.Value < dh.ngaydat.Value)
+            {
+                Session["Message1"] = "Ngày giao hàng phải lớn hơn hoặc bằng ngày hiện tại";
+                return RedirectToAction("DatHang");
+            }
+            dh.giaohang = false;
+            dh.thanhtoan = false;
+            data.DonHangs.InsertOnSubmit(dh);
+            data.SubmitChanges();
+            foreach (var item in gh)
+            {
+                ChiTietDonHang ctdh=new ChiTietDonHang();
+                ctdh.madon = dh.madon;
+                ctdh.masach = item.masach;
+                ctdh.soluong = item.isoluong;
+                ctdh.gia = (decimal)item.giaban;
+                s = data.Saches.Single(n=>n.masach== item.masach);
+                s.soluongton-= ctdh.soluong;
+                data.SubmitChanges();
+                data.ChiTietDonHangs.InsertOnSubmit(ctdh);
+            }
+            data.SubmitChanges();
+            Session["Giohang"] =null;
+   
+            return RedirectToAction("Xacnhandonhang","GioHang");
+        }
         public ActionResult CapnhatGiohang(int id, FormCollection collection)
         {
-            List <Giohang> lstGiohang = Laygiohang();
-            Giohang sanpham = lstGiohang.SingleOrDefault(n => n.masach == id);
+            List<Giohang> lstGiohang = Laygiohang();
+            Giohang sanpham = lstGiohang.FirstOrDefault(n => n.masach == id);
             if (sanpham != null)
             {
-                sanpham.isoluong = int.Parse(collection["txtSoLg"].ToString());
+                Sach sach = data.Saches.FirstOrDefault(n => n.masach == id);
+                int soluong = int.Parse(collection["txtSoLg"].ToString());
+                if(soluong>sach.soluongton)
+                {
+                    Session["Message"] = "Không đủ số lượng";
+                    Session["AlertStatus"] = "danger";
+                    return RedirectToAction("GioHang");
+                }
+                else
+                    sanpham.isoluong = soluong;
             }
             return RedirectToAction("GioHang");
+      
+        }
+        
+        public ActionResult Xacnhandonhang()
+        {
+            return View();
         }
         public ActionResult XoaTatCaGioHang()
         {

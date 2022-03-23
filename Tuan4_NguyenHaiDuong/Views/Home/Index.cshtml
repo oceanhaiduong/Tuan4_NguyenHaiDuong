@@ -22,8 +22,8 @@
             <a href="#" class="btn btn-primary">Order</a>  @Html.ActionLink("Read more...", "Detail", new { id = item.masach }, new { @class = "btn btn-default" })
         </div>*@
                     <div class="DatMua">
-                        <a class="btn-success">@Html.ActionLink("Đặt Mua","GioHang","GioHang")</a>
-                        @*<a class="btn btn-success" href="@Url.Action("ThemGioHang", "GioHang",   new { @id = item.masach, @strURL = Request.Url.ToString() })">Đặt mua</a>*@
+                        @*<a class="btn-success">@Html.ActionLink("Đặt Mua","GioHang","GioHang")</a>*@
+                        <a class="btn btn-success" href="@Url.Action("ThemGioHang", "GioHang",   new { @id = item.masach, @strURL = Request.Url.ToString() })">Đặt mua</a>
                     </div>
                     
                 </div>
